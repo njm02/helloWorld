@@ -1,0 +1,38 @@
+:root { color-scheme: light; --bg: #f5f3ed; --ink: #343731; --muted: #777970; --line: #d1d1c8; }
+* { box-sizing: border-box; }
+body { margin: 0; overflow: hidden; background: var(--bg); color: var(--ink); font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif; font-weight: 300; transition: background-color .5s, color .5s; }
+body.dark { color-scheme: dark; --bg: #151715; --ink: #dcded4; --muted: #999e92; --line: #44483f; }
+header { position: absolute; z-index: 2; top: 40px; left: 48px; right: 48px; display: flex; justify-content: space-between; pointer-events: none; }
+p, .preview-heading, .ends { font-size: 10px; letter-spacing: .15em; font-weight: 400; }
+p { margin: 0 0 12px; color: var(--muted); }
+.time { font-size: clamp(28px, 4vw, 44px); letter-spacing: -.045em; font-variant-numeric: tabular-nums; }
+#period { font-size: 12px; letter-spacing: .03em; margin-left: 5px; }
+.day { text-align: right; width: 130px; padding-top: 3px; }
+.track { height: 1px; background: var(--line); }
+#progress { height: 1px; background: var(--ink); transform-origin: left; }
+canvas { display: block; transition: filter .5s; }
+body.dark canvas { filter: invert(1); }
+footer { position: absolute; z-index: 2; bottom: 30px; left: 48px; right: 48px; display: flex; align-items: center; justify-content: space-between; }
+.title { font-size: 10px; letter-spacing: .2em; font-weight: 400; }
+.title span { display: block; font-size: 11px; letter-spacing: .015em; color: var(--muted); margin-top: 8px; }
+nav { display: flex; gap: 22px; }
+button { border: 0; padding: 8px 0; background: none; color: var(--muted); font: inherit; font-size: 11px; cursor: pointer; }
+button:hover, button[aria-pressed="true"] { color: var(--ink); }
+kbd { font: inherit; margin-left: 5px; opacity: .6; }
+button:focus-visible, input:focus-visible { outline: 1px solid var(--ink); outline-offset: 5px; }
+#preview { position: absolute; z-index: 3; width: min(480px, calc(100% - 48px)); left: 50%; transform: translateX(-50%); bottom: 106px; background: var(--bg); padding: 12px 8px; }
+.preview-heading, .ends { display: flex; justify-content: space-between; color: var(--muted); font-size: 9px; letter-spacing: .09em; }
+input[type="range"] { appearance: none; width: 100%; margin: 18px 0 12px; height: 1px; background: var(--line); cursor: pointer; }
+input::-webkit-slider-thumb { appearance: none; width: 9px; height: 9px; border-radius: 50%; background: var(--ink); }
+input::-moz-range-thumb { width: 9px; height: 9px; border: 0; border-radius: 50%; background: var(--ink); }
+@media (max-width: 600px) { header { top: 28px; left: 24px; right: 24px; } footer { bottom: 24px; left: 24px; right: 24px; } .day { width: 90px; } nav { gap: 14px; } .title span { max-width: 130px; line-height: 1.5; } kbd { display: none; } }
+@media (prefers-reduced-motion: reduce) { body, canvas { transition: none; } }
+
+/* Quiet background-colored clearances keep text legible over the larger art,
+   including when zoomed. No border, shadow or separate panel color. */
+header > div, footer > .title, footer > nav {
+  background: var(--bg);
+  padding: 10px;
+  margin: -10px;
+  transition: background-color .5s;
+}

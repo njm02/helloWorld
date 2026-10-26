@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f3ed">
+  <title>Tree Ring — A Visual Record of Time</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="libraries/p5.min.js"></script>
+  <script src="sketch.js" defer></script>
+</head>
+<body>
+  <header>
+    <div><p id="date">A VISUAL RECORD OF TIME</p><div class="time"><span id="time">0:00:00</span> <span id="period">AM</span></div></div>
+    <div class="day"><p id="progress-label">0% OF DAY</p><div class="track"><div id="progress"></div></div></div>
+  </header>
+  <main id="art" aria-label="Organic tree rings: one ring for every five minutes of the day"></main>
+  <section id="preview" hidden aria-label="Time preview">
+    <div class="preview-heading"><label for="scrubber">PREVIEW · EXPLORE THE DAY</label><span id="ring-count"></span></div>
+    <input id="scrubber" type="range" min="0" max="86399.999" step="0.001" value="0" aria-label="Preview time of day">
+    <div class="ends"><span>12:00 AM</span><span>11:59 PM</span></div>
+  </section>
+  <footer><div class="title">TREE RING <span>One ring, five minutes</span></div><nav aria-label="Clock controls"><button id="zoom" title="Zoom into rings">1×</button><button id="preview-toggle" aria-pressed="false">Preview <kbd>P</kbd></button><button id="theme" aria-pressed="false">Dark <kbd>D</kbd></button></nav></footer>
+</body>
+</html>
