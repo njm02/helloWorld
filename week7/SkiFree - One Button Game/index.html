@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>One Button Ski</title>
+
+    <link rel="stylesheet" type="text/css" href="style.css">
+
+    <script defer src="libraries/p5.min.js"></script>
+    <script defer src="sketch.js"></script>
+  </head>
+
+  <body>
+    <noscript>Enable JavaScript to play One Button Ski.</noscript>
+    <div id="load-error" role="alert" hidden></div>
+    <script>
+      window.addEventListener('error', function (event) {
+        const errorBox = document.getElementById('load-error');
+        if (!errorBox) return;
+        errorBox.hidden = false;
+        errorBox.textContent = 'Game failed to load: ' + (event.message || 'A required script could not be loaded. Check that this folder is opened with Live Server.');
+      });
+      window.addEventListener('load', function () {
+        if (typeof window.p5 === 'undefined') {
+          const errorBox = document.getElementById('load-error');
+          errorBox.hidden = false;
+          errorBox.textContent = 'p5.js did not load. Make sure libraries/p5.min.js is in the project folder and open index.html with Live Server.';
+        }
+      });
+      window.setTimeout(function () {
+        if (typeof window.p5 === 'undefined') return;
+        if (!document.querySelector('canvas')) {
+          const errorBox = document.getElementById('load-error');
+          errorBox.hidden = false;
+          errorBox.textContent = 'The game script loaded, but the canvas was not created. Refresh the page and check the browser Console for the first red error.';
+        }
+      }, 2500);
+    </script>
+  </body>
+</html>
