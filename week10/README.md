@@ -4,7 +4,7 @@ A companion web app for the Ocean Water Quality Beacon, the physical device I'm 
 
 ## Proposal
 
-**I****dea: **The beacon is a circular sign mounted on the back of a lifeguard tower, with a light ring and a dot-matrix text display: green GOOD, yellow CAUTION, red POOR, or grey NO DATA. A QR code under the beacon opens the companion app or mobile website, which shows the same reading and explains why the beacon says it: the bacteria result, recent rain, when the water was last sampled, and what to do.
+**Idea: The beacon is a circular sign mounted on the back of a lifeguard tower, with a light ring and a dot-matrix text display: green GOOD, yellow CAUTION, red POOR, or grey NO DATA. A QR code under the beacon opens the companion app or mobile website, which shows the same reading and explains why the beacon says it: the bacteria result, recent rain, when the water was last sampled, and what to do.
 
 **Who it's for:** Swimmers and surfers already at the beach, deciding in a few seconds whether to go in. Also anyone who sees the beacon and wants to know what the color means.
 
