@@ -1,0 +1,672 @@
+<title>First Opening Animation</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Doto:wght@700&family=Geist+Mono:wght@400&family=Geist:wght@300;400;600&display=swap">
+<style>
+/* Layout: phone mockup on the left, playback controls on the right; stacks on narrow screens. Single dark look by choice. */
+:root {
+  color-scheme: dark;
+  --page: #0d0e10;
+  --panel: #16181b;
+  --ink: #f5f5f7;
+  --muted: rgba(245, 245, 247, 0.62);
+  --line: rgba(255, 255, 255, 0.12);
+  --chip: rgba(255, 255, 255, 0.06);
+  --text: "Geist", "Helvetica Neue", Arial, sans-serif;
+  --mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --dot: "Doto", "Geist Mono", ui-monospace, monospace;
+
+  /* app tokens, from the Figma design system */
+  --app-text: #f5f5f7;
+  --app-text-2: rgba(255, 255, 255, 0.85);
+  --app-glass-strong: rgba(255, 255, 255, 0.18);
+  --app-hairline: rgba(255, 255, 255, 0.18);
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--page);
+  color: var(--ink);
+  font-family: var(--text);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 24px;
+}
+.layout {
+  display: flex; gap: 40px; justify-content: center; align-items: flex-start;
+  flex-wrap: wrap; max-width: 1100px; margin: 0 auto;
+}
+.stage { flex: 0 1 402px; min-width: 0; }
+.phone-wrap { position: relative; margin: 0 auto; }
+.phone {
+  position: absolute; top: 0; left: 0; width: 402px; height: 874px;
+  transform-origin: 0 0; border-radius: 52px; overflow: hidden;
+  box-shadow: 0 0 0 10px #1d1f22, 0 0 0 11px #2a2d31, 0 30px 80px rgba(0,0,0,.5);
+  background: #8d939a;
+}
+.backdrop {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(60% 22% at 50% 0%, rgba(216,232,246,.95), rgba(216,232,246,0) 100%),
+    radial-gradient(45% 18% at 15% 4%, rgba(207,226,244,.9), rgba(207,226,244,0) 100%),
+    linear-gradient(180deg, #a8b5c2 0%, #878e95 32%, #78756f 52%, #a8a6a1 76%, #d1cfcc 100%);
+}
+.scroller {
+  position: absolute; inset: 0; overflow-y: auto; scrollbar-width: none;
+}
+.scroller::-webkit-scrollbar { display: none; }
+
+/* menu bar */
+.menubar {
+  position: absolute; top: 62px; left: 0; right: 0; height: 44px; z-index: 5;
+  display: flex; align-items: center; justify-content: space-between; padding: 0 20px;
+  pointer-events: none;
+}
+.menubar .pill {
+  height: 44px; padding: 0 18px; border-radius: 999px; display: flex; align-items: center;
+  background: rgba(255,255,255,.28); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+  font: 400 13px/18px var(--text); color: #000; transition: color .18s;
+}
+.menubar .logo { position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%) scale(.8); }
+.menubar .logo circle { fill: #000; transition: fill .18s; }
+.menubar.on-dark .pill { color: var(--app-text); background: rgba(255,255,255,.14); }
+.menubar.on-dark .logo circle { fill: var(--app-text); }
+
+/* glass sheet */
+.sheet {
+  --glow: 255, 214, 10;
+  --glow-o: 0;
+  position: relative; margin: 140px 12px 24px; border-radius: 40px; padding: 33px 25px 40px;
+  background: linear-gradient(180deg, rgba(92,97,105,.72), rgba(92,97,105,.86));
+  backdrop-filter: blur(40px); -webkit-backdrop-filter: blur(40px);
+  border: 1px solid rgba(255,255,255,.10);
+  box-shadow:
+    inset 0 0 30px rgba(var(--glow), calc(.6 * var(--glow-o))),
+    inset 0 0 8px rgba(var(--glow), calc(.75 * var(--glow-o)));
+  color: var(--app-text);
+  display: flex; flex-direction: column; gap: 28px;
+  overflow: hidden;
+}
+.mono { font: 400 12px/16px var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--app-text-2); }
+.dotnum { font: 700 14px/16px var(--dot); color: var(--app-text-2); letter-spacing: .04em; }
+.daterow { display: flex; align-items: center; justify-content: space-between; }
+.daterow .left { display: flex; align-items: center; gap: 10px; }
+.daterow .sq { width: 7px; height: 7px; border-radius: 1.5px; background: var(--app-text-2); }
+.beach { font: 400 28px/34px var(--text); margin: 0; }
+.status { display: flex; flex-direction: column; gap: 20px; }
+.hero { position: relative; width: 328px; height: 272px; }
+.hero canvas { position: absolute; left: -36px; top: -36px; width: 400px; height: 344px; pointer-events: none; }
+.hero .word {
+  position: absolute; left: 0; right: 0; top: 135px; text-align: center;
+  font: 400 44px/48px var(--text); color: var(--app-text); will-change: filter, opacity, transform;
+}
+.hero .word.nodata { color: var(--app-text-2); }
+.hero .loading {
+  position: absolute; left: 0; right: 0; top: 151px; text-align: center;
+}
+.message { display: flex; flex-direction: column; gap: 8px; }
+.reason { font: 400 17px/24px var(--text); }
+.advice { font: 600 17px/24px var(--text); }
+.updated { font: 400 13px/18px var(--text); color: var(--app-text-2); }
+.hairline { height: 1px; background: var(--app-hairline); }
+.source { height: 44px; display: flex; align-items: center; justify-content: space-between; }
+.notice {
+  display: flex; align-items: center; gap: 12px; padding: 13px 17px; border-radius: 20px;
+  background: var(--app-glass-strong);
+}
+.notice .ndot { width: 8px; height: 8px; border-radius: 50%; background: var(--app-text); flex: none; }
+.notice .nmsg { font: 400 13px/18px var(--text); margin-top: 1px; }
+.tabs { display: flex; gap: 8px; }
+.tab {
+  height: 44px; padding: 0 16px; border-radius: 999px; display: flex; align-items: center; gap: 8px;
+  background: var(--app-glass-strong); font: 400 13px/18px var(--text); color: var(--app-text);
+}
+.tab .dotnum { font-size: 12px; }
+.tab.active { background: var(--app-text); color: #000; }
+.tab.active .dotnum { color: #000; }
+.readings { display: flex; flex-direction: column; gap: 20px; }
+.rhead, .rrow { display: flex; align-items: baseline; gap: 6px; }
+.rhead .label, .rrow .label { flex: 1; font: 400 17px/24px var(--text); }
+.rhead .val { font: 400 17px/24px var(--text); font-variant-numeric: tabular-nums; }
+.rrows { display: flex; flex-direction: column; }
+.rrow { height: 48px; align-items: center; border-top: 1px solid var(--app-hairline); }
+.rrow .val { font: 400 17px/24px var(--text); }
+
+/* controls */
+.controls {
+  flex: 1 1 320px; max-width: 440px; min-width: 0;
+  display: flex; flex-direction: column; gap: 22px;
+}
+.controls h1 { font: 600 22px/28px var(--text); margin: 0 0 6px; text-wrap: balance; }
+.controls .lede { margin: 0; color: var(--muted); font: 400 14px/21px var(--text); }
+.group { display: flex; flex-direction: column; gap: 8px; }
+.group-label { font: 400 11px/14px var(--mono); letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.seg { display: flex; flex-wrap: wrap; gap: 6px; }
+.seg input { position: absolute; opacity: 0; pointer-events: none; }
+.seg label {
+  display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 0 14px; border-radius: 999px;
+  background: var(--chip); border: 1px solid var(--line); font: 400 13px/1 var(--text); cursor: pointer; color: var(--ink);
+}
+.seg label .sw { width: 8px; height: 8px; border-radius: 50%; }
+.seg input:checked + label { background: var(--ink); color: #000; border-color: var(--ink); }
+.seg input:focus-visible + label { outline: 2px solid var(--ink); outline-offset: 2px; }
+.row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+button.btn {
+  height: 36px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line);
+  background: var(--chip); color: var(--ink); font: 400 13px/1 var(--text); cursor: pointer;
+}
+button.btn.primary { background: var(--ink); color: #000; border-color: var(--ink); }
+button.btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+.scrub { display: flex; align-items: center; gap: 12px; }
+.scrub input { flex: 1; min-width: 0; accent-color: #f5f5f7; }
+.scrub output { font: 400 12px/1 var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; width: 56px; text-align: right; }
+.check { display: inline-flex; align-items: center; gap: 8px; font: 400 13px/1 var(--text); cursor: pointer; }
+.check input { accent-color: #f5f5f7; width: 16px; height: 16px; }
+.phases { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; border-top: 1px solid var(--line); }
+.phases li {
+  display: grid; grid-template-columns: 76px 1fr auto; gap: 12px; align-items: baseline;
+  padding: 10px 0; border-bottom: 1px solid var(--line); color: var(--muted); transition: color .15s;
+}
+.phases li b { font: 400 11px/16px var(--mono); letter-spacing: .1em; text-transform: uppercase; }
+.phases li span { font: 400 13px/18px var(--text); }
+.phases li em { font: 400 11px/16px var(--mono); font-style: normal; font-variant-numeric: tabular-nums; }
+.phases li.on { color: var(--ink); }
+.phases li.skip { opacity: .4; }
+.note { font: 400 12px/18px var(--text); color: var(--muted); margin: 0; }
+
+@media (max-width: 760px) {
+  .layout { gap: 28px; }
+  .controls { max-width: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .menubar .pill, .menubar .logo circle { transition: none; }
+}
+</style>
+
+<div class="layout">
+  <div class="stage">
+    <div class="phone-wrap" id="phoneWrap">
+      <div class="phone" id="phone">
+        <div class="backdrop"></div>
+        <div class="scroller" id="scroller">
+          <div class="sheet" id="sheet">
+            <div class="daterow" data-head>
+              <div class="left"><span class="sq"></span><span class="dotnum">11.15.26</span></div>
+              <span class="mono">Beach 86 St</span>
+            </div>
+            <h2 class="beach" data-head>Rockaway Beach</h2>
+            <div class="status">
+              <div class="mono" data-head>Water quality</div>
+              <div class="hero" id="hero">
+                <canvas id="cv" width="400" height="344" aria-hidden="true"></canvas>
+                <div class="loading mono" id="loadLabel">Checking water</div>
+                <div class="word" id="word">Caution</div>
+              </div>
+              <div class="message">
+                <div class="reason" id="reason" data-reveal></div>
+                <div class="advice" id="advice" data-reveal></div>
+                <div class="updated" id="updated" data-reveal></div>
+              </div>
+              <div class="hairline" data-reveal></div>
+              <div class="source" data-reveal>
+                <span class="mono">Source and test details</span>
+                <svg width="32" height="24" viewBox="0 0 32 24" fill="none" aria-hidden="true"><path d="M2 12h27M20 3l9 9-9 9" stroke="#f5f5f7" stroke-width="1.2"/></svg>
+              </div>
+            </div>
+            <div class="notice" data-reveal>
+              <span class="ndot"></span>
+              <div><div class="mono">Forecast</div><div class="nmsg" id="forecast"></div></div>
+            </div>
+            <div class="tabs" data-reveal>
+              <span class="tab active"><span class="dotnum">01</span>Readings</span>
+              <span class="tab"><span class="dotnum">02</span>Trend</span>
+              <span class="tab"><span class="dotnum">03</span>Map</span>
+            </div>
+            <div class="readings" data-reveal id="readings">
+              <div class="row" style="justify-content:space-between"><span class="mono">Readings</span><span class="mono" id="sample"></span></div>
+              <div class="rhead"><span class="label">Enterococci</span><span class="val" id="ent"></span><span class="mono" id="entUnit"></span></div>
+              <div class="rrows">
+                <div class="rrow"><span class="label">Rainfall · 24 h</span><span class="val" id="rain"></span></div>
+                <div class="rrow"><span class="label">Water temperature</span><span class="val">68°F</span></div>
+                <div class="rrow"><span class="label">Waves</span><span class="val">2–3 ft</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="menubar" id="menubar">
+          <span class="pill">Beaches</span>
+          <svg class="logo" id="logo" width="28" height="33" viewBox="0 0 28 33" aria-label="Beach Water Check"></svg>
+          <span class="pill">About</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div>
+      <h1>Horseshoe loader</h1>
+      <p class="lede">What the companion page shows right after someone scans the beacon. The dots stay white while the reading loads, so nothing looks like a result until the real one arrives.</p>
+    </div>
+
+    <div class="group">
+      <span class="group-label">Reading that comes back</span>
+      <div class="seg" role="radiogroup" aria-label="Reading">
+        <input type="radio" name="status" id="st-good" value="good"><label for="st-good"><span class="sw" style="background:#30D158"></span>Good</label>
+        <input type="radio" name="status" id="st-caution" value="caution" checked><label for="st-caution"><span class="sw" style="background:#FFD60A"></span>Caution</label>
+        <input type="radio" name="status" id="st-poor" value="poor"><label for="st-poor"><span class="sw" style="background:#FF453A"></span>Poor</label>
+        <input type="radio" name="status" id="st-nodata" value="nodata"><label for="st-nodata"><span class="sw" style="background:rgba(255,255,255,.35)"></span>No data</label>
+      </div>
+    </div>
+
+    <div class="group">
+      <span class="group-label">Data arrives after</span>
+      <div class="seg" role="radiogroup" aria-label="Load time">
+        <input type="radio" name="load" id="ld-0" value="0"><label for="ld-0">Instant</label>
+        <input type="radio" name="load" id="ld-1" value="1500" checked><label for="ld-1">1.5 s</label>
+        <input type="radio" name="load" id="ld-2" value="4000"><label for="ld-2">4 s</label>
+        <input type="radio" name="load" id="ld-3" value="10000"><label for="ld-3">10 s</label>
+      </div>
+    </div>
+
+    <div class="group">
+      <span class="group-label">Playback</span>
+      <div class="row">
+        <button class="btn primary" id="replay" type="button">Replay</button>
+        <button class="btn" id="pause" type="button">Pause</button>
+        <div class="seg" role="radiogroup" aria-label="Speed">
+          <input type="radio" name="speed" id="sp-1" value="1" checked><label for="sp-1">1×</label>
+          <input type="radio" name="speed" id="sp-05" value="0.5"><label for="sp-05">0.5×</label>
+          <input type="radio" name="speed" id="sp-025" value="0.25"><label for="sp-025">0.25×</label>
+        </div>
+      </div>
+      <div class="scrub">
+        <input type="range" id="scrub" min="0" max="4000" step="1" value="0" aria-label="Timeline">
+        <output id="clock">0.00 s</output>
+      </div>
+      <label class="check"><input type="checkbox" id="reduce">Reduce motion</label>
+    </div>
+
+    <ol class="phases" id="phases">
+      <li data-ph="ping"><b>Ping</b><span>One dot appears and sends out two rings, like it's calling the beacon.</span><em></em></li>
+      <li data-ph="split"><b>Split</b><span>The dot splits into 28 dots that fly out and draw the horseshoe.</span><em></em></li>
+      <li data-ph="chase"><b>Chase</b><span>A white trail runs along the dots until the data is in. After 6 s the label changes to "Still checking".</span><em></em></li>
+      <li data-ph="fill"><b>Fill</b><span>The trail finishes its lap, then the gradient flows in from the start. A few colored dots lead the way and the white dot rides the tip.</span><em></em></li>
+      <li data-ph="settle"><b>Settle</b><span>The leftover dots melt into the faint track, the edge glow comes up and the details rise in. The Enterococci number counts up.</span><em></em></li>
+    </ol>
+    <p class="note">No data never shows a color: the dots melt into a plain grey track instead. Reduce motion skips the ping, split and chase and crossfades to the result.</p>
+  </div>
+</div>
+
+<script>
+(() => {
+  const RED = [255, 69, 58], YEL = [255, 214, 10], GRN = [48, 209, 88], WHITE = [245, 245, 247];
+  const DATA = {
+    good:    { word: 'Good', target: .85, glow: GRN, reason: 'Bacteria levels are within the safe range.', advice: 'Good for swimming today.', updated: 'Updated 9:20 AM · Nov 15', forecast: 'Clear skies all day', ent: 12, unit: 'MPN/100 mL', sample: 'Sample 0412', rain: '0.0 in' },
+    caution: { word: 'Caution', target: .55, glow: YEL, reason: 'Bacteria elevated after rain.', advice: 'Wait 24–48 hours before swimming.', updated: 'Updated 9:20 AM · Nov 15', forecast: 'Rain expected this afternoon', ent: 110, unit: 'MPN/100 mL', sample: 'Sample 0412', rain: '1.2 in' },
+    poor:    { word: 'Poor', target: .18, glow: RED, reason: 'Bacteria far above the safe limit.', advice: 'Don’t swim today. Check back tomorrow.', updated: 'Updated 9:20 AM · Nov 15', forecast: 'More rain expected tonight', ent: 320, unit: 'MPN/100 mL', sample: 'Sample 0412', rain: '2.4 in' },
+    nodata:  { word: 'No data', target: 0, glow: null, reason: 'No recent water sample for this beach.', advice: '', updated: 'Last sample Nov 10 · 6 days ago', forecast: 'Rain expected this afternoon', ent: null, unit: 'No recent sample', sample: 'Last sample 0398', rain: '1.2 in' },
+  };
+
+  // geometry (canvas px; canvas sits 36px outside the 328×272 hero)
+  const PAD = 36, CX = PAD + 164, CY = PAD + 159, R = 130, SW = 18;
+  const N = 28, TRAIL = 6, LAP = 1000;
+  const T_PING = 120, T_SPLIT = 650, STAG = 14, FLY = 420;
+  const SPLIT_END = T_SPLIT + (N - 1) * STAG + FLY;
+  const SLOW_AFTER = 6000;
+
+  const cv = document.getElementById('cv');
+  const ctx = cv.getContext('2d');
+  const $ = id => document.getElementById(id);
+  const sheet = $('sheet'), word = $('word'), loadLabel = $('loadLabel');
+  const heads = [...document.querySelectorAll('[data-head]')];
+  const reveals = [...document.querySelectorAll('[data-reveal]')];
+  const readingsIdx = reveals.indexOf($('readings'));
+
+  const reduceMQ = matchMedia('(prefers-reduced-motion: reduce)');
+  const S = { status: 'caution', load: 1500, speed: 1, reduce: reduceMQ.matches, T: 0, playing: true };
+  $('reduce').checked = S.reduce;
+
+  // ---------- math ----------
+  const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+  const lerp = (a, b, t) => a + (b - a) * t;
+  const eOutCubic = t => 1 - Math.pow(1 - t, 3);
+  const eInCubic = t => t * t * t;
+  const eInOut = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+  const eOutBack = (t, s = 1.4) => 1 + (s + 1) * Math.pow(t - 1, 3) + s * Math.pow(t - 1, 2);
+  const ang = p => (135 + 270 * p) * Math.PI / 180;
+  const at = p => [CX + R * Math.cos(ang(p)), CY + R * Math.sin(ang(p))];
+  const mix = (a, b, t) => a.map((v, i) => Math.round(lerp(v, b[i], t)));
+  const rgba = (c, a) => `rgba(${c[0]},${c[1]},${c[2]},${a})`;
+  const STOPS = [[0, RED], [.12, RED], [.40, YEL], [.58, YEL], [.82, GRN], [1, GRN]];
+  function col(p) {
+    for (let i = 1; i < STOPS.length; i++) {
+      if (p <= STOPS[i][0]) {
+        const [p0, c0] = STOPS[i - 1], [p1, c1] = STOPS[i];
+        return mix(c0, c1, (p - p0) / (p1 - p0 || 1));
+      }
+    }
+    return GRN;
+  }
+
+  // ---------- timeline ----------
+  let TL;
+  function buildTimeline() {
+    const d = DATA[S.status];
+    const t = {};
+    if (S.reduce) {
+      t.reveal = Math.max(500, S.load);
+      t.revealEnd = t.reveal + 300;
+      t.chase = 0; t.laps = 0;
+    } else {
+      t.chase = SPLIT_END;
+      t.laps = S.load <= SPLIT_END ? 0 : Math.ceil((S.load - SPLIT_END) / LAP);
+      t.reveal = SPLIT_END + t.laps * LAP;
+      t.fillDur = d.glow ? 380 + 520 * d.target : (N - 1) * 12 + 350;
+      t.revealEnd = t.reveal + t.fillDur;
+    }
+    t.word = S.reduce ? t.reveal : t.reveal + (t.fillDur || 0) * .5;
+    t.glow = S.reduce ? t.reveal : t.revealEnd - 80;
+    t.content = S.reduce ? t.reveal : t.revealEnd - 120;
+    t.total = t.revealEnd + (S.reduce ? 500 : 1300);
+    TL = t;
+    $('scrub').max = Math.round(t.total);
+    const ph = {
+      ping: [0, T_SPLIT], split: [T_SPLIT, SPLIT_END], chase: [t.chase, t.reveal],
+      fill: [t.reveal, t.revealEnd], settle: [t.revealEnd, t.total],
+    };
+    if (S.reduce) { ph.ping = ph.split = ph.chase = null; ph.fill = [t.reveal, t.revealEnd]; }
+    TL.ph = ph;
+    document.querySelectorAll('#phases li').forEach(li => {
+      const r = ph[li.dataset.ph];
+      const skip = !r || r[1] - r[0] <= 0;
+      li.classList.toggle('skip', skip);
+      li.querySelector('em').textContent = skip ? 'skipped' : `${(r[0] / 1000).toFixed(2)}–${(r[1] / 1000).toFixed(2)} s`;
+    });
+  }
+
+  // ---------- copy ----------
+  function applyCopy() {
+    const d = DATA[S.status];
+    word.textContent = d.word;
+    word.classList.toggle('nodata', !d.glow);
+    $('reason').textContent = d.reason;
+    $('advice').textContent = d.advice;
+    $('advice').hidden = !d.advice;
+    $('updated').textContent = d.updated;
+    $('forecast').textContent = d.forecast;
+    $('entUnit').textContent = d.unit;
+    $('sample').textContent = d.sample;
+    $('rain').textContent = d.rain;
+    if (d.glow) sheet.style.setProperty('--glow', d.glow.join(','));
+  }
+
+  // ---------- drawing ----------
+  const hasConic = typeof ctx.createConicGradient === 'function';
+  let conicCache = null;
+  function conic() {
+    if (conicCache) return conicCache;
+    const g = ctx.createConicGradient(ang(0), CX, CY);
+    for (const [p, c] of STOPS) g.addColorStop(p * .75, rgba(c, 1));
+    g.addColorStop(.80, rgba(GRN, 1));
+    g.addColorStop(.97, rgba(RED, 1));
+    g.addColorStop(1, rgba(RED, 1));
+    return (conicCache = g);
+  }
+  function gradArc(p0, p1, alpha) {
+    if (p1 - p0 < .001 || alpha <= 0) return;
+    ctx.save();
+    ctx.globalAlpha = alpha;
+    ctx.lineWidth = SW; ctx.lineCap = 'round';
+    if (hasConic) {
+      ctx.strokeStyle = conic();
+      ctx.beginPath(); ctx.arc(CX, CY, R, ang(p0), ang(p1)); ctx.stroke();
+    } else {
+      const steps = Math.max(2, Math.ceil((p1 - p0) * 90));
+      for (let i = 0; i < steps; i++) {
+        const a = p0 + (p1 - p0) * i / steps, b = p0 + (p1 - p0) * (i + 1) / steps;
+        ctx.strokeStyle = rgba(col((a + b) / 2), 1);
+        ctx.lineCap = i === 0 || i === steps - 1 ? 'round' : 'butt';
+        ctx.beginPath(); ctx.arc(CX, CY, R, ang(a), ang(b) + .004); ctx.stroke();
+      }
+    }
+    ctx.restore();
+  }
+  function greyArc(alpha) {
+    if (alpha <= 0) return;
+    ctx.save();
+    ctx.lineWidth = SW; ctx.lineCap = 'round'; ctx.strokeStyle = rgba([255, 255, 255], .18 * alpha);
+    ctx.beginPath(); ctx.arc(CX, CY, R, ang(0), ang(1)); ctx.stroke();
+    ctx.restore();
+  }
+  function dot(x, y, r, c, a, shadow) {
+    if (r <= .1 || a <= 0) return;
+    ctx.save();
+    if (shadow) { ctx.shadowColor = 'rgba(0,0,0,.3)'; ctx.shadowBlur = 6; ctx.shadowOffsetY = 2; }
+    ctx.fillStyle = rgba(c, a);
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+  }
+  function ring(r, a) {
+    if (a <= 0) return;
+    ctx.save(); ctx.strokeStyle = rgba(WHITE, a); ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.arc(CX, CY, r, 0, Math.PI * 2); ctx.stroke(); ctx.restore();
+  }
+
+  const DIM_R = 2.6, DIM_A = .32;
+
+  function fillAt(T) {
+    const d = DATA[S.status];
+    const u = clamp((T - TL.reveal) / TL.fillDur);
+    return d.target * eOutBack(u, .6);
+  }
+
+  function drawMotion(T) {
+    const d = DATA[S.status];
+    // ping rings + seed dot
+    for (const start of [T_PING + 100, T_PING + 350]) {
+      const t = (T - start) / 900;
+      if (t > 0 && t < 1) ring(lerp(14, 140, eOutCubic(t)), .5 * (1 - t));
+    }
+    if (T >= T_PING) {
+      let r = 13 * eOutBack(clamp((T - T_PING) / 300), 1.6);
+      const s = clamp((T - T_SPLIT) / ((N - 1) * STAG + FLY * .6));
+      r *= 1 - eInCubic(s);
+      dot(CX, CY, r, WHITE, 1, true);
+    }
+
+    const revealing = T >= TL.reveal;
+    const f = revealing && d.glow ? fillAt(T) : 0;
+    const filling = revealing && T < TL.revealEnd;
+    const settleM = d.glow ? eInOut(clamp((T - TL.revealEnd) / 380)) : 0;
+
+    // track under everything once it settles
+    if (d.glow) gradArc(0, 1, .14 * settleM);
+    else greyArc(clamp((T - (TL.revealEnd - 150)) / 250));
+
+    // dots
+    const lapPos = T >= TL.chase && T < TL.reveal ? ((T - TL.chase) % LAP) / LAP * (N - 1 + TRAIL) : -99;
+    for (let i = 0; i < N; i++) {
+      const p = i / (N - 1);
+      const born = T_SPLIT + i * STAG;
+      if (T < born) continue;
+      const [sx, sy] = at(p);
+      const ft = clamp((T - born) / FLY);
+      const k = eOutBack(ft, 1.1);
+      let x = lerp(CX, sx, k), y = lerp(CY, sy, k);
+      let r = lerp(3.5, DIM_R, ft), a = lerp(1, DIM_A, ft), c = WHITE;
+
+      if (lapPos > -99) {
+        const dd = lapPos - i;
+        const lit = dd >= 0 && dd < TRAIL ? Math.pow(1 - dd / TRAIL, 1.4) : 0;
+        r = DIM_R + 3.2 * lit; a = DIM_A + (1 - DIM_A) * lit;
+      }
+
+      if (revealing) {
+        if (d.glow) {
+          if (p <= f) continue;                       // swallowed by the fill
+          const ahead = (p - f) * (N - 1);
+          if (filling && ahead < 3.5) {               // colored dots leading the fill
+            const lead = 1 - ahead / 3.5;
+            c = col(p); r = lerp(DIM_R, 7, lead); a = lerp(DIM_A, 1, Math.min(1, lead * 1.6));
+          } else if (settleM > 0) {                    // melt into the faint track
+            c = mix(WHITE, col(p), settleM); r = lerp(DIM_R, SW / 2, settleM);
+            a = lerp(DIM_A, .14, settleM) * (1 - clamp((settleM - .7) / .3));
+          }
+        } else {
+          const m = eInOut(clamp((T - TL.reveal - i * 12) / 350));
+          const fade = 1 - clamp((T - (TL.revealEnd - 150)) / 250);
+          r = lerp(DIM_R, SW / 2, m); a = lerp(DIM_A, .18, m) * fade;
+        }
+      }
+      dot(x, y, r, c, a);
+    }
+
+    // fill + reading dot
+    if (revealing && d.glow) {
+      gradArc(0, Math.max(f, .0011), 1);
+      const [tx, ty] = at(Math.max(f, 0));
+      const tipIn = eOutBack(clamp((T - TL.reveal) / 220), 1.8);
+      dot(tx, ty, 13 * tipIn, WHITE, 1, true);
+    }
+  }
+
+  function drawFinal(alpha) {
+    const d = DATA[S.status];
+    if (!d.glow) { greyArc(alpha); return; }
+    gradArc(0, 1, .14 * alpha);
+    gradArc(0, d.target, alpha);
+    const [tx, ty] = at(d.target);
+    dot(tx, ty, 13, WHITE, alpha, true);
+  }
+
+  function drawReduced(T) {
+    const a = clamp((T - TL.reveal) / 300);
+    const pulse = .22 + .12 * (.5 + .5 * Math.sin(T / 500));
+    for (let i = 0; i < N; i++) {
+      const [x, y] = at(i / (N - 1));
+      dot(x, y, DIM_R, WHITE, pulse * (1 - a));
+    }
+    drawFinal(a);
+  }
+
+  // ---------- frame ----------
+  function render(T) {
+    const d = DATA[S.status];
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.clearRect(0, 0, 400, 344);
+    if (S.reduce) drawReduced(T); else drawMotion(T);
+
+    // sheet entrance + header
+    const open = S.reduce ? 1 : eOutCubic(clamp(T / 450));
+    sheet.style.opacity = S.reduce ? 1 : open;
+    sheet.style.transform = `translateY(${(1 - open) * 40}px)`;
+    heads.forEach((el, i) => {
+      const o = S.reduce ? 1 : eOutCubic(clamp((T - 80 - i * 60) / 350));
+      el.style.opacity = o;
+    });
+
+    // loading label
+    let lab = 0;
+    if (S.reduce) lab = 1 - clamp((T - TL.reveal) / 200);
+    else lab = Math.min(clamp((T - (SPLIT_END - 250)) / 250), 1 - clamp((T - TL.reveal) / 200));
+    loadLabel.style.opacity = lab;
+    loadLabel.textContent = !S.reduce && T - TL.chase > SLOW_AFTER ? 'Still checking' : 'Checking water';
+
+    // status word
+    const w = clamp((T - TL.word) / (S.reduce ? 300 : 420));
+    const we = eOutCubic(w);
+    word.style.opacity = we * (d.glow ? 1 : 1);
+    word.style.filter = S.reduce ? 'none' : `blur(${(1 - we) * 12}px)`;
+    word.style.transform = S.reduce ? 'none' : `scale(${1.06 - .06 * we})`;
+
+    // glow
+    const g = d.glow ? eOutCubic(clamp((T - TL.glow) / 600)) : 0;
+    sheet.style.setProperty('--glow-o', g.toFixed(3));
+
+    // details rise in
+    reveals.forEach((el, k) => {
+      const t0 = TL.content + (S.reduce ? 0 : k * 55);
+      const o = eOutCubic(clamp((T - t0) / (S.reduce ? 300 : 380)));
+      el.style.opacity = o;
+      el.style.transform = S.reduce ? 'none' : `translateY(${(1 - o) * 14}px)`;
+    });
+    const entEl = $('ent');
+    if (d.ent == null) entEl.textContent = '—';
+    else {
+      const t0 = TL.content + (S.reduce ? 0 : readingsIdx * 55);
+      const c = S.reduce ? 1 : eOutCubic(clamp((T - t0) / 700));
+      entEl.textContent = Math.round(d.ent * c);
+    }
+
+    // controls
+    $('scrub').value = Math.round(T);
+    $('clock').value = (T / 1000).toFixed(2) + ' s';
+    $('clock').textContent = (T / 1000).toFixed(2) + ' s';
+    document.querySelectorAll('#phases li').forEach(li => {
+      const r = TL.ph[li.dataset.ph];
+      li.classList.toggle('on', !!r && T >= r[0] && T < r[1]);
+    });
+  }
+
+  // ---------- loop ----------
+  let last = performance.now();
+  function tick(now) {
+    const dt = Math.min(50, now - last); last = now;
+    if (S.playing) {
+      S.T += dt * S.speed;
+      if (S.T >= TL.total) { S.T = TL.total; S.playing = false; syncPause(); }
+    }
+    render(S.T);
+    requestAnimationFrame(tick);
+  }
+  function syncPause() { $('pause').textContent = S.playing ? 'Pause' : (S.T >= TL.total ? 'Done' : 'Play'); }
+  function restart() { conicCache = null; applyCopy(); buildTimeline(); S.T = 0; S.playing = true; syncPause(); $('scroller').scrollTop = 0; }
+
+  // ---------- controls ----------
+  document.querySelectorAll('input[name=status]').forEach(el => el.addEventListener('change', () => { S.status = el.value; restart(); }));
+  document.querySelectorAll('input[name=load]').forEach(el => el.addEventListener('change', () => { S.load = +el.value; restart(); }));
+  document.querySelectorAll('input[name=speed]').forEach(el => el.addEventListener('change', () => { S.speed = +el.value; }));
+  $('reduce').addEventListener('change', e => { S.reduce = e.target.checked; restart(); });
+  $('replay').addEventListener('click', restart);
+  $('pause').addEventListener('click', () => {
+    if (S.T >= TL.total) { restart(); return; }
+    S.playing = !S.playing; syncPause();
+  });
+  $('scrub').addEventListener('input', e => { S.T = +e.target.value; S.playing = false; syncPause(); });
+  $('scroller').addEventListener('scroll', e => {
+    $('menubar').classList.toggle('on-dark', e.target.scrollTop > 80);
+  });
+
+  // ---------- logo: water drop drawn in 14 dots ----------
+  (() => {
+    const svg = $('logo'); const n = 14; let out = '';
+    for (let i = 0; i < n; i++) {
+      const t = (i / n) * Math.PI * 2;
+      const x = 14 + 11.5 * Math.sin(t) * Math.sin(t / 2);
+      const y = 16.5 - 14.5 * Math.cos(t);
+      out += `<circle cx="${x.toFixed(2)}" cy="${y.toFixed(2)}" r="1.7"/>`;
+    }
+    svg.innerHTML = out;
+  })();
+
+  // ---------- sizing ----------
+  let dpr = 1;
+  function size() {
+    const wrap = $('phoneWrap');
+    const avail = wrap.parentElement.clientWidth;
+    const hScale = Math.max(.6, (innerHeight - 48) / 874);
+    const s = Math.min(1, avail / 402, hScale);
+    wrap.style.width = 402 * s + 'px';
+    wrap.style.height = 874 * s + 'px';
+    $('phone').style.transform = `scale(${s})`;
+    dpr = Math.min(3, window.devicePixelRatio || 1);
+    cv.width = 400 * dpr; cv.height = 344 * dpr;
+    conicCache = null;
+  }
+  addEventListener('resize', size);
+  size();
+  applyCopy();
+  buildTimeline();
+  requestAnimationFrame(t => { last = t; tick(t); });
+})();
+</script>
